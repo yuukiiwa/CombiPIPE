@@ -43,7 +43,7 @@ nextflow CombiSEAL.nf
       --sampinfo <sampleInfo.csv> \
       --barcodes <barcode_list.csv> \
       --pattern <1st 7 letters from the fastq file> \ 
-      --dimensions <number of gRNAs> \ 
+      --dimensions <number of modules> \ 
       --linker <barcode-connecting sequence>
 ```
 ## Publications
