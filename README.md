@@ -1,6 +1,6 @@
 # CombiPIPE
 An analysis pipeline for the CombiGEM (done) and CombiSEAL (will add this next week) platforms
-### Running the pipelines
+## Running the pipelines
 The first three processes are the same in both pipelines.
 1. sample extraction
 2. barcode extraction
@@ -17,6 +17,6 @@ nextflow CombiGEM.nf --fastq <fastq> --sampinfo <sampleInfo.csv> --barcodes <bar
 ```
 nextflow CombiSEAL.nf --fastq <fastq> --sampinfo <sampleInfo.csv> --barcodes <barcode_list.csv> --pattern <1st 7 letters from the fastq file> --dimensions <number of modules> --linker <barcode-connecting sequence>
 ```
-### CombiGEM publications
+## CombiGEM publications
 1. https://www.nature.com/articles/nbt.3326
 2. https://www.pnas.org/content/113/9/2544.short
