@@ -10,6 +10,7 @@ pip install numpy
 Please install nextflow
 ```
 curl -s https://get.nextflow.io | bash
+export PATH=$PATH:</path/to/file>
 ```
 Download JDK 8 from [here](https://www.oracle.com/java/technologies/javase-jdk8-downloads.html)
 A dmg or exe file serves well. Open once downloaded, then follow the instructions on the installer.
