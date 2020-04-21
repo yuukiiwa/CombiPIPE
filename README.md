@@ -1,11 +1,20 @@
 # CombiPIPE
 Analysis pipelines for combinatorial screens done using the CombiGEM-CRISPR and CombiSEAL (coming soon) platforms.
 ## Before running
-Please install regex, scpicy, numpy for python and DescTools on RStudio.
+Please install DescTools on RStudio. Then go to terminal (any command line window) and install regex, scipy, and numpy for python. If python3, simply use pip3 instead of pip.
 ```
 pip install regex
 pip install scipy
 pip install numpy
+```
+Please install nextflow
+```
+curl -s https://get.nextflow.io | bash
+```
+Download JDK 8 from [here](https://www.oracle.com/java/technologies/javase-jdk8-downloads.html)
+A dmg or exe file serves well. Open once downloaded, then follow the instructions on the installer.
+```
+export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
 ```
 ## Running the pipelines
 The first three processes are the same in both pipelines.
