@@ -1,4 +1,4 @@
-import argparse, regex, os
+import argparse, regex, os, math
 parser = argparse.ArgumentParser()
 parser.add_argument("-b", required=True, type=str, help="barcode list")
 parser.add_argument("-f", required=True, type=str, help="fastq file")
@@ -6,16 +6,19 @@ parser.add_argument("-l", default="CAATTC", type=str, help="linker sequence")
 parser.add_argument("-n", default=2, type=int, help="nwise")
 parser.add_argument("-p", required=True, type=str, help="1st 7 characters in the fastq file")
 args=parser.parse_args()
-barf,fastq,linker,nwise,pattern=args.b,args.f,args.l.upper(),args.n,args.p
+barf,fastq_dir,linker,nwise,pattern=args.b,args.f,args.l.upper(),args.n,args.p
 
 #get all the barcodes used in the experiment
 def getBarcodes(barf):
  file=open(barf,"r")
- barcodes=[]
+ barcodes,bdict=[],{}
  for ln in file:
-  barcodes.append(ln.strip("\r\n"))
- return barcodes
-barcodes=getBarcodes(barf)
+  ln=ln.strip("\r\n").split(",")
+  barcodes.append(ln[0])
+  bdict[ln[0]]=ln[1:]
+ return (barcodes,bdict)
+gb=getBarcodes(barf)
+barcodes,bdict=gb[0],gb[1]
 
 #allowing one nt mismatch in the sample id/barcode in the sequence
 def oneMismatch(id,seq):
@@ -108,8 +111,8 @@ def addSeqtoSeqs(seq,seqs,adaptor,linker,nwise,barcodes,dict,sampsepout,successC
     dict,successC=runseqtoBarcode[0],runseqtoBarcode[1]   #dictionary contains all the keys and # of entries; all successful counts
  return (seqs,dict,successC)  
 
-def readFastq(fastq,linker,nwise,barcodes,adaptor,name,pattern):
- file=open(fastq,"r") #open the fastq input file
+def readFastq(fastq_dir,fastq,linker,nwise,barcodes,adaptor,name,pattern):
+ file=open(fastq_dir+"/"+fastq,"r") #open the fastq input file
  sampsepfn="sample_"+name+"_"+adaptor+".csv" #open the sample separator output file
  sampsepout=open(sampsepfn,"w")
  row="Sample_ID"              #generate the header for the sample separator output
@@ -138,34 +141,38 @@ def readFastq(fastq,linker,nwise,barcodes,adaptor,name,pattern):
  sampseprep.close()
  return (seqs,dict,successC)
 
-def outBCanalyzer(barcodes,dict,BCout):
+def outBCanalyzer(barcodes,dict,BCout,bdict,successC):
  for key in dict:
   k=key.split("_")
-  row=""
+  ke,bc="",""
   for b in k:
-   row+=barcodes[int(b)]+","
-  row+=","+str(dict[key][-1])
+   bc+=barcodes[int(b)]+","
+   ke+=bdict[barcodes[int(b)]][0]+"_" 
+  ke=ke.strip("_")
+  lgCPM=math.log2((dict[key][-1]/float(successC))*1000000)
+  row=bc+ke+","+str(dict[key][-1])+","+str(lgCPM)
   BCout.write(row+"\r\n")
  BCout.close()
 
-
-fn=fastq.split("_")
-adaptor,name=fn[0],fn[1]
-Fastq=readFastq(fastq,linker,nwise,barcodes,adaptor,name,pattern)
-seqs,dict,successC=Fastq[0],Fastq[1],Fastq[2]
-BCfn="BCcount_"+name+"_"+adaptor+".csv"
-BCout=open(BCfn,"w")
-BCout.write("Sample ID: ,"+adaptor+"\r\n")
-BCout.write("Input count: ,"+str(len(seqs))+"\r\n")
-BCout.write("Combinations: ,"+str(len(dict))+"\r\n")
-BCout.write("Success Count: ,"+str(successC)+"\r\n")
-BCout.write("Discarded Count: ,"+str(len(seqs)-successC)+"\r\n")
-BCout.write(""+"\r\n")
-BCout.write("Combinations"+"\r\n")
-row=""
-for i in range(nwise):
- row+="BC"+str(nwise-i)+","
-row=row.strip(",")
-BCout.write(row+"\r\n")
-outBCanalyzer(barcodes,dict,BCout)
+filelist=os.listdir(fastq_dir)
+for fastq in filelist:
+ fn=fastq.split("_")
+ adaptor,name=fn[0],fn[1]
+ Fastq=readFastq(fastq_dir,fastq,linker,nwise,barcodes,adaptor,name,pattern)
+ seqs,dict,successC=Fastq[0],Fastq[1],Fastq[2]
+ BCfn="BCcount_"+name+"_"+adaptor+".csv"
+ BCout=open(BCfn,"w")
+ BCout.write("Sample ID: ,"+adaptor+"\r\n")
+ BCout.write("Input count: ,"+str(len(seqs))+"\r\n")
+ BCout.write("Combinations: ,"+str(len(dict))+"\r\n")
+ BCout.write("Success Count: ,"+str(successC)+"\r\n")
+ BCout.write("Discarded Count: ,"+str(len(seqs)-successC)+"\r\n")
+ BCout.write(""+"\r\n")
+ BCout.write("Combinations"+"\r\n")
+ row=""
+ for i in range(nwise):
+  row+="BC"+str(nwise-i)+","
+ row+="key,BCcounts,log2CPM"
+ BCout.write(row+"\r\n")
+ outBCanalyzer(barcodes,dict,BCout,bdict,successC)
 

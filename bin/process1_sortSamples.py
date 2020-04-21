@@ -3,7 +3,7 @@ fastq,sampinfo,identifier_pattern,dict=sys.argv[1],sys.argv[2],sys.argv[3],{}
 sfile=open(sampinfo,"r")
 for ln in sfile:
  ln=ln.strip("\r\n").split(",")
- dict[ln[1]]=ln[0]
+ dict[ln[0]]=ln[1]
 
 def oneMismatch(id,seq):
  restring='('+id+'){e<=1}'
