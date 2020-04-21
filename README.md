@@ -1,5 +1,5 @@
 # CombiPIPE
-Analysis pipelines for the CombiGEM-CRISPR (done) and CombiSEAL (will be added in by next week) platforms
+Analysis pipelines for combinatorial screens done using the CombiGEM-CRISPR and CombiSEAL (coming soon) platforms.
 ## Running the pipelines
 The first three processes are the same in both pipelines.
 1. sample extraction
