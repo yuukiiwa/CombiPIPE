@@ -17,6 +17,18 @@ A dmg or exe file serves well. Open once downloaded, then follow the instruction
 ```
 export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
 ```
+Generate a sample info. csv file containing sample index sequences, sample names, and conditions:
+```
+GATCAATGTTC,SA162,1
+CGATCTGGCGAA,SA163,1
+TCGTTCCTG,SA164,0
+ATCAGAACAT,SA165,0
+```
+Generate a barcode csv file containing the barcodes and keys:
+```
+AAGCGAGT,1
+CTCTAGGT,2
+```
 ## Running the pipelines
 The first three processes are the same in both pipelines.
 1. extract samples
