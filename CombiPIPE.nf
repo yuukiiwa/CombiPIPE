@@ -33,6 +33,8 @@ ch_process2 = file(params.process2, checkIfExists: true)
 ch_process3 = file(params.process3, checkIfExists: true)
 ch_process4 = file(params.process4, checkIfExists: true)
 ch_process5 = file(params.process5, checkIfExists: true)
+ch_process6 = file(params.process6, checkIfExists: true)
+
 process sortSamples {
   publishDir "./outputs_sortSamples", mode: 'copy',
         saveAs: { filename ->
@@ -107,7 +109,7 @@ process PairwiseGI_genDunnettInputs {
   file process4 from ch_process4
 
   output:
-  file "*.csv"
+  file "*.csv" into ch_genelvGI
   val "outputs_pairwiseGI" into ch_process4_out 
 
   script:
@@ -132,5 +134,24 @@ process batchDunnettTest {
   script:
   """
   Rscript --vanilla $process5 $PWD/$dir
+  """
+}
+
+process mergeDunnetts {
+  publishDir "./genelevelOutput", mode: 'copy',
+        saveAs: { filename ->
+                      if (!filename.endsWith(".version")) filename
+                }
+  input:
+  file gi from ch_genelvGI
+  val dir from ch_process5_out
+  file process6 from ch_process6
+
+  output:
+  file "*.csv"
+
+  script:
+  """
+  python $process6 $PWD/$dir $gi
   """
 }
