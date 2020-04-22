@@ -1,6 +1,6 @@
 import sys
 fn=sys.argv[1]
-ofn=fn.split(".")[0]+"GI.csv"
+ofn="genelevelGI.csv"
 
 def addsgRNA(sgRNA,FC,sgDict):
  if sgRNA not in sgDict:

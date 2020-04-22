@@ -1,10 +1,10 @@
 args = commandArgs(trailingOnly=TRUE)
 path<-args[1]
-files <- grep(list.files(path), pattern='FCPVGI.csv', inv=T, value=T)
+files <- grep(list.files(path), pattern='genelevelGI.csv', inv=T, value=T)
 
 library(DescTools)
 for(i in 1:length(files)){
-  fullpath<-paste(path,files[1],sep='/') 
+  fullpath<-paste(path,files[i],sep='/') 
   counts <- read.table(fullpath,sep=",")
   colnames(counts)<- c("combination","combinations","fold_change")
   df <- counts
