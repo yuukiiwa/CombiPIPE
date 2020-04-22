@@ -58,6 +58,9 @@ nextflow CombiSEAL.nf
       --dimensions <number of modules> \ 
       --linker <barcode-connecting sequence>
 ```
+## If ran successfully, here is what you will see:
+![img] (CombiPIPE.png)
+
 ## Publications
 #### CombiGEM-CRISPR
 1. https://www.nature.com/articles/nbt.3326
