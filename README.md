@@ -59,7 +59,7 @@ nextflow CombiSEAL.nf
       --linker <barcode-connecting sequence>
 ```
 ## If ran successfully, here is what you will see:
-![] (success_run.png)
+![](success_run.png)
 
 ## Publications
 #### CombiGEM-CRISPR
