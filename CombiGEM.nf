@@ -109,7 +109,7 @@ process PairwiseGI_genDunnettInputs {
   file process4 from ch_process4
 
   output:
-  file "*.csv" into ch_genelvGI
+  file "genelevel*" into ch_genelvGI
   val "outputs_pairwiseGI" into ch_process4_out 
 
   script:
