@@ -52,7 +52,7 @@ process sortSamples {
    
   script:
   """
-  python $process1 $fastq $sampinfo $pattern
+  python3 $process1 $fastq $sampinfo $pattern
   """
 }
 
@@ -75,7 +75,7 @@ process newBCanalyzer {
 
   script:
   """  
-  python $process2 -b $barcode_list -f $PWD/$fastq_dir -l $linker -n $dimensions -p $pattern
+  python3 $process2 -b $barcode_list -f $PWD/$fastq_dir -l $linker -n $dimensions -p $pattern
   """
 }
 
@@ -95,7 +95,7 @@ process log2FC_neglogPV {
 
   script:
   """
-  python $process3 $PWD/$BC_dir $sampinfo $dimensions
+  python3 $process3 $PWD/$BC_dir $sampinfo $dimensions
   """
 }
 
@@ -114,7 +114,7 @@ process PairwiseGI_genDunnettInputs {
 
   script:
   """
-  python $process4 $fcpv
+  python3 $process4 $fcpv
   """
 }
 
@@ -152,6 +152,6 @@ process mergeDunnetts {
 
   script:
   """
-  python $process6 $PWD/$dir $gi
+  python3 $process6 $PWD/$dir $gi
   """
 }
