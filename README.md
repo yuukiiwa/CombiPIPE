@@ -38,7 +38,7 @@ The first three processes are the same in both pipelines.
 4. calculate gene-level genetic interaction
 5. calculate Dunnett test p-values for each gene-level combinations
 ```
-nextflow CombiGEM.nf 
+nextflow CombiGEM.nf \
       --fastq <fastq> \
       --sampinfo <sampleInfo.csv> \
       --barcodes <barcode_list.csv> \
@@ -47,17 +47,8 @@ nextflow CombiGEM.nf
       --linker <barcode-connecting sequence>
 ```
 #### For CombiSEAL (coming soon)
-4. (trying to figure this out)
-5. epistasis calculation
-```
-nextflow CombiSEAL.nf      
-      --fastq <fastq> \
-      --sampinfo <sampleInfo.csv> \
-      --barcodes <barcode_list.csv> \
-      --pattern <1st 7 letters from the fastq file> \ 
-      --dimensions <number of modules> \ 
-      --linker <barcode-connecting sequence>
-```
+4. epistasis calculation (based on FACS sorting data)
+
 ## If ran successfully, here is what you will see:
 ![](success_run.png)
 
