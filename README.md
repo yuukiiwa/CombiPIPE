@@ -51,6 +51,7 @@ nextflow CombiGEM.nf \
 4. epistasis calculation (based on FACS sorting data)
 
 ## Try running the pipeline with the test-dataset
+The test dataset is a minimal dataset that contains 3 percent of all reads from the ovarian cancer 3-way analysis described in the [Cell Reports study by Zhou et al.](https://www.cell.com/cell-reports/fulltext/S2211-1247(20)31005-6#secsectitle0070)
 1. clone/download this directory to your computer
 2. get to the downloaded directory from your command line window
 3. type `gunzip test-dataset/OVARIAN_testdataset.fastq.gz`
@@ -58,9 +59,9 @@ nextflow CombiGEM.nf \
 ```
 nextflow CombiGEM.nf --fastq test-dataset/OVARIAN_testdataset.fastq --sampinfo test-dataset/sampleInfo.csv --barcodes test-dataset/barcode_list.csv --pattern @D00691 --dimensions 3 --linker CAATTC --dummysgs 1,2
 ```
-#### If ran successfully, here is what you will see:
+#### If ran successfully, these are what you will see:
 ![](test-dataset/successful_run_testdataset.png)
-5. you can look into the folders starting with "output_" for the results
+![](test-dataset/successful_run_outputs.png)
 
 ## Publications
 #### CombiGEM-CRISPR
