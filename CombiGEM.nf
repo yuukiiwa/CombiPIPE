@@ -107,6 +107,7 @@ process PairwiseGI_genDunnettInputs {
   input:
   file fcpv from ch_process3_out
   file process4 from ch_process4
+  val dimensions from ch_dimensions
 
   output:
   file "genelevel*" into ch_genelvGI
@@ -115,7 +116,7 @@ process PairwiseGI_genDunnettInputs {
 
   script:
   """
-  python3 $process4 $fcpv
+  python3 $process4 $fcpv $dimensions 1,2
   """
 }
 
@@ -139,7 +140,7 @@ process batchDunnettTest {
 }
 
 process mergeDunnetts {
-  publishDir "./genelevelOutput", mode: 'copy',
+  publishDir "./output_mergedDunnettTests", mode: 'copy',
         saveAs: { filename ->
                       if (!filename.endsWith(".version")) filename
                 }
