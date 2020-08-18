@@ -34,7 +34,7 @@ The first three processes are the same in both pipelines.
 1. extract samples
 2. extract barcodes
 3. calculate lg Fold Change and -log10 P value between the initial and experimental group.
-#### For CombiGEM (This pipeline supports pairwise screens only)
+#### For CombiGEM (supports screens with two or more dimensions)
 4. calculate gene-level genetic interaction
 5. calculate Dunnett test p-values for each gene-level combinations
 ```
