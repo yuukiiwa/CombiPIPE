@@ -1,5 +1,8 @@
 import sys
-fn=sys.argv[1]
+from itertools import permutations
+
+fn,nwise,dummysg=sys.argv[1],int(sys.argv[2]),sys.argv[3]
+dummysg=dummysg.split(",")
 ofn="genelevelGI.csv"
 
 def addsgRNA(sgRNA,FC,sgDict):
@@ -9,18 +12,18 @@ def addsgRNA(sgRNA,FC,sgDict):
   sgDict[sgRNA].append(FC)
  return sgDict
 
-def addCombo(ln,FC,comDict):
- combo=ln[0]+"-"+ln[1]
- revco=ln[1]+"-"+ln[0]
- if combo not in comDict and revco not in comDict:
-  comDict[combo]=[FC]
- if combo in comDict:
-  comDict[combo].append(FC)
- if revco in comDict:
-  comDict[revco].append(FC)
+def addCombo(com,FC,comDict):
+ combos=list(permutations(com))
+ combos=["_".join(combo) for combo in combos]
+ if not any(combo in comDict for combo in combos): 
+  comDict[combos[0]]=[FC]
+ else:
+  for combo in combos:
+   if combo in comDict:
+    comDict[combo].append(FC)
  return comDict
 
-def openFile(fn):
+def openFile(fn,niwse,dummies):
  sgDict, comDict={},{}
  file=open(fn,"r")
  header=file.readline().strip("\r\n").split(",")
@@ -28,27 +31,29 @@ def openFile(fn):
   ln=ln.strip("\r\n").split(",")[1:]
   FC=float(ln[-2])
   #0->2; 1->3
-  dummies=["1","2"]
-  if ln[0] in dummies and ln[1] not in dummies:
-   addsgRNA(ln[1],FC,sgDict)
-  if ln[1] in dummies and ln[0] not in dummies:
-   addsgRNA(ln[0],FC,sgDict)
-  if ln[1] not in dummies and ln[0] not in dummies:
-   if ln[1] != ln[0]:
-    addCombo(ln,FC,comDict)
+  combo,dcont=ln[:nwise],0
+  for d in dummies:
+   dcont+=combo.count(d)
+  if dcont == nwise-1:
+   for sg in combo:
+    if sg not in dummies:
+     sgRNA=sg
+   addsgRNA(sgRNA,FC,sgDict)
+  else:
+   if len([x for x in combo if combo.count(x) > 1]) == 0:
+    addCombo(combo,FC,comDict)
  for sgRNA in sgDict:
   sgDict[sgRNA].append(sum(sgDict[sgRNA])/len(sgDict[sgRNA]))
  for combo in comDict:
   comDict[combo].append(sum(comDict[combo])/len(comDict[combo]))
  return (sgDict,comDict)
-op=openFile(fn)
+op=openFile(fn,nwise,dummysg)
 sgDict,comDict=op[0],op[1]  #the last item is the mean FC
-print(comDict)
 
 def calcGI(sgDict,comDict):
  giDict={}
  for combo in comDict:
-  sgs=combo.split("-")
+  sgs=combo.split("_")
   obs=comDict[combo][-1]
   exp=0
   for sg in sgs:
@@ -70,15 +75,15 @@ def outFile(giDict,ofn):
  outfile.close()
 outFile(giDict,ofn)
 
-
 def outDunnettFile(comDict,sgDict):
  for combo in comDict:
   outfile=open(combo+"_Dunnettin.csv","w")
   for fc in comDict[combo]:
    outfile.write(combo+",one_two,"+str(fc)+"\r\n")
-  combo=combo.split("-")
+  combo=combo.split("_")
   for sg in combo:
-   for fc in sgDict[sg]:
-    outfile.write(sg+",one,"+str(fc)+"\r\n")
+   if sg in sgDict:
+    for fc in sgDict[sg]:
+     outfile.write(sg+",one,"+str(fc)+"\r\n")
   outfile.close()
 outDunnettFile(comDict,sgDict)
