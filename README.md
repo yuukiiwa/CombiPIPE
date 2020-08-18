@@ -45,16 +45,27 @@ nextflow CombiGEM.nf \
       --pattern <1st 7 letters from the fastq file> \ 
       --dimensions <number of gRNAs> \ 
       --linker <barcode-connecting sequence>
+      --linker <dummy sgRNA names separated by "," (e.g.: 1,2)>
 ```
 #### For CombiSEAL (coming soon)
 4. epistasis calculation (based on FACS sorting data)
 
-## If ran successfully, here is what you will see:
-![](success_run.png)
+## Try running the pipeline with the test-dataset
+1. clone/download this directory to your computer
+2. get to the downloaded directory from your command line window
+3. type `gunzip test-dataset/OVARIAN_testdataset.fastq.gz`
+4. run the pipeline with nextflow by typing the following:
+```
+nextflow CombiGEM.nf --fastq test-dataset/OVARIAN_testdataset.fastq --sampinfo test-dataset/sampleInfo.csv --barcodes test-dataset/barcode_list.csv --pattern @D00691 --dimensions 3 --linker CAATTC --dummysgs 1,2
+```
+#### If ran successfully, here is what you will see:
+![](test-dataset/successful_run_testdataset.png)
+5. you can look into the folders starting with "output_" for the results
 
 ## Publications
 #### CombiGEM-CRISPR
 1. https://www.nature.com/articles/nbt.3326
 2. https://www.pnas.org/content/113/9/2544.short
+3. https://www.cell.com/cell-reports/fulltext/S2211-1247(20)31005-6#secsectitle0070
 #### CombiSEAL
 1. https://www.nature.com/articles/s41592-019-0473-0
