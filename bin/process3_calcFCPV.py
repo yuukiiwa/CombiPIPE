@@ -16,7 +16,7 @@ def grabInfo(sampleInfo):
 refd=grabInfo(sampleInfo)
 
 filelist=[fn for fn in os.listdir(dir) if fn.startswith("BC")]
-def CPMd(filelist):
+def CPMd(filelist,nwise):
  cpmd={}
  for fn in filelist:
   file=open("/"+dir+"/"+fn,"r")
@@ -25,13 +25,13 @@ def CPMd(filelist):
    file.readline()
   for ln in file:
    ln=ln.strip("\r\n").split(",")
-   if ln[2] not in cpmd:
-    cpmd[ln[2]]={}
-    cpmd[ln[2]][samp]=ln[-1]
+   if ln[nwise] not in cpmd:
+    cpmd[ln[nwise]]={}
+    cpmd[ln[nwise]][samp]=ln[-1]
    else:
-    cpmd[ln[2]][samp]=ln[-1]
+    cpmd[ln[nwise]][samp]=ln[-1]
  return cpmd
-cpmd=CPMd(filelist)
+cpmd=CPMd(filelist,nwise)
 
 def lgFC(cpmd,refd):
  tot=len(refd["0"])*len(refd["1"])
@@ -49,8 +49,9 @@ def lgFC(cpmd,refd):
       fcd[com][key]=fc
      else:
       fcd[com][key]=fc
-  avfc=sfc/float(len(fcd[com])) 
-  fcd[com]["avg"]=avfc
+  if com in fcd:
+   avfc=sfc/float(len(fcd[com])) 
+   fcd[com]["avg"]=avfc
  return fcd
 fcd=lgFC(cpmd,refd)
 
@@ -84,6 +85,10 @@ for key in pvd:
  k=key.split("_")
  for i in k:
   row+=","+i
- row+=","+str(fcd[key]["avg"])+","+str(pvd[key][-1])
- outfile.write(row+"\r\n")
+ if key in fcd and key in pvd:
+  row+=","+str(fcd[key]["avg"])+","+str(pvd[key][-1])
+  outfile.write(row+"\r\n")
+ elif key in fcd and key not in pvd:
+  row+=","+str(fcd[key]["avg"])+",nan" 
+  outfile.write(row+"\r\n")
 outfile.close()
