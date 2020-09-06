@@ -144,13 +144,17 @@ def readFastq(fastq_dir,fastq,linker,nwise,barcodes,adaptor,name,pattern):
 def outBCanalyzer(barcodes,dict,BCout,bdict,successC):
  for key in dict:
   k=key.split("_")
-  ke,bc="",""
+  ke,bc,sg,ge="","","",""
   for b in k:
    bc+=barcodes[int(b)]+","
    ke+=bdict[barcodes[int(b)]][0]+"_" 
+   sg+=bdict[barcodes[int(b)]][1]+"+"
+   ge+=bdict[barcodes[int(b)]][1].split("_")[0]+"+"
   ke=ke.strip("_")
+  sg=sg.strip("+")
+  ge=ge.strip("+")
   lgCPM=math.log2((dict[key][-1]/float(successC))*1000000)
-  row=bc+ke+","+str(dict[key][-1])+","+str(lgCPM)
+  row=bc+ke+","+sg+","+ge+","+str(dict[key][-1])+","+str(lgCPM)
   BCout.write(row+"\r\n")
  BCout.close()
 
@@ -172,7 +176,7 @@ for fastq in filelist:
  row=""
  for i in range(nwise):
   row+="BC"+str(nwise-i)+","
- row+="key,BCcounts,log2CPM"
+ row+="key,sgRNAs,genes,BCcounts,log2CPM"
  BCout.write(row+"\r\n")
  outBCanalyzer(barcodes,dict,BCout,bdict,successC)
 

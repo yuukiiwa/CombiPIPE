@@ -1,7 +1,7 @@
 import sys, os
 dir,fcgi=sys.argv[1],open(sys.argv[2],"r")
 outfile=open("genlevelGIdunnettPV.csv","w")
-filelist=os.listdir(dir)
+filelist=[fn for fn in os.listdir(dir) if fn.endswith(".csv")]
 pdict={}
 for fn in filelist:
  file=open("/"+dir+"/"+fn,"r")

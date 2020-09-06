@@ -1,9 +1,7 @@
 import sys
-from itertools import permutations
-
-fn,nwise,dummysg=sys.argv[1],int(sys.argv[2]),sys.argv[3]
-dummysg=dummysg.split(",")
-ofn="genelevelGI.csv"
+fn=sys.argv[1]
+ofn="sgRNAlevelGI.csv"
+ofn2="genelevelGI.csv"
 
 def addsgRNA(sgRNA,FC,sgDict):
  if sgRNA not in sgDict:
@@ -12,48 +10,56 @@ def addsgRNA(sgRNA,FC,sgDict):
   sgDict[sgRNA].append(FC)
  return sgDict
 
-def addCombo(com,FC,comDict):
- combos=list(permutations(com))
- combos=["_".join(combo) for combo in combos]
- if not any(combo in comDict for combo in combos): 
-  comDict[combos[0]]=[FC]
- else:
-  for combo in combos:
-   if combo in comDict:
-    comDict[combo].append(FC)
+def addCombo(ln,FC,comDict):
+ combo=ln[0]
+ cs=combo.split("+")
+ revco=cs[1]+"+"+cs[0]
+ if combo not in comDict and revco not in comDict:
+  comDict[combo]=[FC]
+ if combo in comDict:
+  comDict[combo].append(FC)
+ if revco in comDict:
+  comDict[revco].append(FC)
  return comDict
 
-def openFile(fn,niwse,dummies):
- sgDict, comDict={},{}
+def openFile(fn):
+ sgDict,sgcomDict={},{}
+ geDict,gecomDict={},{}
  file=open(fn,"r")
  header=file.readline().strip("\r\n").split(",")
  for ln in file:
   ln=ln.strip("\r\n").split(",")[1:]
   FC=float(ln[-2])
   #0->2; 1->3
-  combo,dcont=ln[:nwise],0
-  for d in dummies:
-   dcont+=combo.count(d)
-  if dcont == nwise-1:
-   for sg in combo:
-    if sg not in dummies:
-     sgRNA=sg
-   addsgRNA(sgRNA,FC,sgDict)
-  else:
-   if len([x for x in combo if combo.count(x) > 1]) == 0:
-    addCombo(combo,FC,comDict)
+  dummies=["1","2"]
+  sgl,gl=ln,ln[1:]
+  del sgl[1]
+  if ln[2] in dummies and ln[1] not in dummies:
+   addsgRNA(sgl[0].split("+")[0],FC,sgDict)
+   addsgRNA(gl[0].split("+")[0],FC,geDict)
+  if ln[1] in dummies and ln[2] not in dummies:
+   addsgRNA(sgl[0].split("+")[1],FC,sgDict)
+   addsgRNA(gl[0].split("+")[1],FC,geDict)
+  if ln[1] not in dummies and ln[2] not in dummies:
+   if ln[1] != ln[2]:
+    addCombo(sgl,FC,sgcomDict)
+    addCombo(gl,FC,gecomDict)
  for sgRNA in sgDict:
   sgDict[sgRNA].append(sum(sgDict[sgRNA])/len(sgDict[sgRNA]))
- for combo in comDict:
-  comDict[combo].append(sum(comDict[combo])/len(comDict[combo]))
- return (sgDict,comDict)
-op=openFile(fn,nwise,dummysg)
-sgDict,comDict=op[0],op[1]  #the last item is the mean FC
+ for combo in sgcomDict:
+  sgcomDict[combo].append(sum(sgcomDict[combo])/len(sgcomDict[combo]))
+ for gene in geDict:
+  geDict[gene].append(sum(geDict[gene])/len(geDict[gene]))
+ for combo in gecomDict:
+  gecomDict[combo].append(sum(gecomDict[combo])/len(gecomDict[combo]))
+ return (sgDict,sgcomDict,geDict,gecomDict)
+op=openFile(fn)
+sgDict,sgcomDict,geDict,gecomDict=op[0],op[1],op[2],op[3]  #the last item is the mean FC
 
 def calcGI(sgDict,comDict):
  giDict={}
  for combo in comDict:
-  sgs=combo.split("_")
+  sgs=combo.split("+")
   obs=comDict[combo][-1]
   exp=0
   for sg in sgs:
@@ -62,28 +68,31 @@ def calcGI(sgDict,comDict):
   GI=obs-exp
   giDict[combo]=(exp,obs,GI)
  return giDict
-giDict=calcGI(sgDict,comDict)
+sgRNAgiDict=calcGI(sgDict,sgcomDict)
+GENEgiDict=calcGI(geDict,gecomDict)
 
 def outFile(giDict,ofn):
  outfile=open(ofn,"w")
- outfile.write("gene combo,expected,observed,GI"+"\r\n")
+ outfile.write("combo,expected,observed,GI"+"\r\n")
  for combo in giDict:
   row=combo
   for i in giDict[combo]:
    row+=","+str(i)
   outfile.write(row+"\r\n")
  outfile.close()
-outFile(giDict,ofn)
+outFile(sgRNAgiDict,ofn)
+outFile(GENEgiDict,ofn2)
 
 def outDunnettFile(comDict,sgDict):
  for combo in comDict:
-  outfile=open(combo+"_Dunnettin.csv","w")
-  for fc in comDict[combo]:
-   outfile.write(combo+",one_two,"+str(fc)+"\r\n")
-  combo=combo.split("_")
-  for sg in combo:
-   if sg in sgDict:
+  t=combo.split("+")
+  if t[0] != t[1]:
+   outfile=open(combo+"_Dunnettin.csv","w")
+   for fc in comDict[combo]:
+    outfile.write(combo+",one_two,"+str(fc)+"\r\n")
+   combo=combo.split("+")
+   for sg in combo:
     for fc in sgDict[sg]:
      outfile.write(sg+",one,"+str(fc)+"\r\n")
-  outfile.close()
-outDunnettFile(comDict,sgDict)
+   outfile.close()
+outDunnettFile(gecomDict,geDict)

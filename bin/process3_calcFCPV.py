@@ -16,8 +16,8 @@ def grabInfo(sampleInfo):
 refd=grabInfo(sampleInfo)
 
 filelist=[fn for fn in os.listdir(dir) if fn.startswith("BC")]
-def CPMd(filelist,nwise):
- cpmd={}
+def CPMd(filelist):
+ cpmd,named={},{}
  for fn in filelist:
   file=open("/"+dir+"/"+fn,"r")
   samp=fn.split("_")[1].split(".")[0]
@@ -25,13 +25,16 @@ def CPMd(filelist,nwise):
    file.readline()
   for ln in file:
    ln=ln.strip("\r\n").split(",")
-   if ln[nwise] not in cpmd:
-    cpmd[ln[nwise]]={}
-    cpmd[ln[nwise]][samp]=ln[-1]
+   if ln[2] not in cpmd:
+    cpmd[ln[2]]={}
+    cpmd[ln[2]][samp]=ln[-1]
+    named[ln[2]]=(ln[3],ln[4])
    else:
-    cpmd[ln[nwise]][samp]=ln[-1]
- return cpmd
-cpmd=CPMd(filelist,nwise)
+    cpmd[ln[2]][samp]=ln[-1]
+ return (cpmd,named)
+runCPMd=CPMd(filelist)
+cpmd=runCPMd[0]
+named=runCPMd[1]
 
 def lgFC(cpmd,refd):
  tot=len(refd["0"])*len(refd["1"])
@@ -49,14 +52,15 @@ def lgFC(cpmd,refd):
       fcd[com][key]=fc
      else:
       fcd[com][key]=fc
-  if com in fcd:
-   avfc=sfc/float(len(fcd[com])) 
-   fcd[com]["avg"]=avfc
+  avfc=sfc/float(len(fcd[com])) 
+  fcd[com]["avg"]=avfc
  return fcd
 fcd=lgFC(cpmd,refd)
 
 def npval(cpmd,refd):
  pvd={}
+ na = len(refd["0"])
+ nb = len(refd["1"])
  for com in cpmd:
   pvd[com]=[[],[]]
   for a in refd["0"]:
@@ -66,29 +70,28 @@ def npval(cpmd,refd):
    if i in cpmd[com]:
     pvd[com][1].append(float(cpmd[com][i]))
  for com in pvd:
-  a=np.array(pvd[com][0])
-  b=np.array(pvd[com][1])
-  (ts,pv)=stats.ttest_ind(a,b,equal_var=False)
-  npv=-(math.log(pv))
-  pvd[com].append(npv)
+  if len(pvd[com][0]) == na and len(pvd[com][1]) == nb:
+   a=np.array(pvd[com][0])
+   b=np.array(pvd[com][1])
+   (ts,pv)=stats.ttest_ind(a,b,equal_var=False)
+   npv=-(math.log(pv))
+   pvd[com].append(npv)
+  else:
+   pvd[com].append("") 
  return pvd
 pvd=npval(cpmd,refd)
 
 outfile=open("FCPV.csv","w")
-row="key"
+row="key,sgRNAs,genes"
 for i in range(nwise):
  row+=",guideRNA"+str(nwise-i)
 row+=",log2FC,-log10pval"
 outfile.write(row+"\r\n")
 for key in pvd:
- row=key.strip("_")
+ row=key.strip("_")+","+named[key][0].strip("+")+","+named[key][1].strip("+")
  k=key.split("_")
  for i in k:
   row+=","+i
- if key in fcd and key in pvd:
-  row+=","+str(fcd[key]["avg"])+","+str(pvd[key][-1])
-  outfile.write(row+"\r\n")
- elif key in fcd and key not in pvd:
-  row+=","+str(fcd[key]["avg"])+",nan" 
-  outfile.write(row+"\r\n")
+ row+=","+str(fcd[key]["avg"])+","+str(pvd[key][-1])
+ outfile.write(row+"\r\n")
 outfile.close()
