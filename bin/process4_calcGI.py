@@ -16,8 +16,8 @@ def addCombo(ln,FC,comDict):
  revco=cs[1]+"+"+cs[0]
  if combo not in comDict and revco not in comDict:
   comDict[combo]=[FC]
- if combo in comDict:
-  comDict[combo].append(FC)
+# if combo in comDict:
+#  comDict[combo].append(FC)
  if revco in comDict:
   comDict[revco].append(FC)
  return comDict
