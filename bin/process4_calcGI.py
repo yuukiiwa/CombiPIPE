@@ -93,7 +93,7 @@ def outDunnettFile(comDict,sgDict):
   outfile=open(combo+"_Dunnettin.csv","w")
   for fc in comDict[combo]:
    outfile.write(combo+",one_two,"+str(fc)+"\r\n")
-  combo=combo.split("_")
+  combo=combo.split("+")
   for sg in combo:
    if sg in sgDict:
     for fc in sgDict[sg]:
