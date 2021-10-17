@@ -3,7 +3,7 @@ from scipy import stats
 import numpy as np
 dir,sampleInfo,nwise=sys.argv[1],sys.argv[2],int(sys.argv[3])
 def grabInfo(sampleInfo):
- file=open(sampleInfo,"r")
+ file=open(sampleInfo,mode="r")
  refd={}
  for ln in file:
   ln=ln.strip("\r\n").split(",")
@@ -25,12 +25,13 @@ def CPMd(filelist):
    file.readline()
   for ln in file:
    ln=ln.strip("\r\n").split(",")
-   if ln[2] not in cpmd:
-    cpmd[ln[2]]={}
-    cpmd[ln[2]][samp]=ln[-1]
-    named[ln[2]]=(ln[3],ln[4])
+   com=ln[2].strip("\ufeff")
+   if com not in cpmd:
+    cpmd[com]={}
+    cpmd[com][samp]=ln[-1]
+    named[com]=(ln[3],ln[4])
    else:
-    cpmd[ln[2]][samp]=ln[-1]
+    cpmd[com][samp]=ln[-1]
  return (cpmd,named)
 runCPMd=CPMd(filelist)
 cpmd=runCPMd[0]
@@ -40,6 +41,7 @@ def lgFC(cpmd,refd):
  tot=len(refd["0"])*len(refd["1"])
  fcd={}
  for com in cpmd:
+  com=com.strip("\ufeff")
   sfc=0
   for a in refd["0"]:   
    for b in refd["1"]:
