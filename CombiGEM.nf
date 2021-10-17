@@ -28,7 +28,7 @@ if (params.barcodes) { ch_barcodes = file(params.barcodes, checkIfExists: true) 
 if (params.pattern) { ch_pattern = params.pattern } else { exit 1, "Please provide the first 7 characters of the fastq file!" }
 if (params.linker) { ch_linker = params.linker } else { exit 1, "Please provide the linker sequence! (AWp12 uses CAATTC)" }
 if (params.dimensions) { ch_dimensions = params.dimensions } else { exit 1, "Please provide the number of dimensions (modules)!" }
-if (params.dummysgs) { ch_dummysgs = params.dummysgs } else { exit 1, "Please provide the dummy sgRNA number code (ex. 1,2)!" }
+if (params.dummysgs) { ch_dummysgs = params.dummysgs }
 
 ch_process1 = file(params.process1, checkIfExists: true)
 ch_process2 = file(params.process2, checkIfExists: true)
@@ -107,10 +107,10 @@ process PairwiseGI_genDunnettInputs {
                       if (!filename.endsWith(".version")) filename
                 }
   input:
-  val dummysgs from ch_dummysgs
-  val dimensions from ch_dimensions
   file fcpv from ch_process3_out
   file process4 from ch_process4
+  val dimensions from ch_dimensions
+  val dummysgs from ch_dummysgs
 
   output:
   file "genelevel*" into ch_genelvGI
@@ -143,7 +143,7 @@ process batchDunnettTest {
 }
 
 process mergeDunnetts {
-  publishDir "./genelevelOutput", mode: 'copy',
+  publishDir "./output_mergedDunnettTests", mode: 'copy',
         saveAs: { filename ->
                       if (!filename.endsWith(".version")) filename
                 }
