@@ -19,8 +19,8 @@ filelist=[fn for fn in os.listdir(dir) if fn.startswith("BC")]
 def CPMd(filelist,nwise):
  cpmd={}
  for fn in filelist:
-  #file=open("/"+dir+"/"+fn,"r")
-  file=open(dir+"/"+fn,"r")
+  file=open("/"+dir+"/"+fn,"r")
+  #file=open(dir+"/"+fn,"r")
   samp=fn.split("_")[1].split(".")[0]
   for y in range (8):
    file.readline()
