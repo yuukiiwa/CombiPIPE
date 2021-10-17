@@ -4,7 +4,8 @@ outfile=open("genlevelGIdunnettPV.csv","w")
 filelist=[fn for fn in os.listdir(dir) if fn.endswith(".csv")]
 pdict={}
 for fn in filelist:
- file=open("/"+dir+"/"+fn,"r")
+ #file=open("/"+dir+"/"+fn,"r")
+ file=open(dir+"/"+fn,"r")
  file.readline()
  fn=fn[7:-14]
  pval=file.readline().split(",")[-1]
